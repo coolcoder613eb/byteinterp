@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "byteinterp": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\tzema\\OneDrive\\Documents\\GitHub\\byteinterp\\hw.bin"
+    }
+  }
+}
