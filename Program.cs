@@ -3,38 +3,40 @@ using System.Collections.Generic;
 using System.IO;
 namespace byteinterp
 {
-    internal class Programs
+    class Program
     {
         const byte outcode = 1;
         static void Main(string[] args)
         {
-            Byte[] bytes = File.ReadAllBytes(args[0]);
-            int len = bytes.Length;
-            Console.WriteLine(bytes);
-            Console.WriteLine(len);
-            Queue<Byte> code = new Queue<Byte>();
-            foreach (Byte b in bytes)
+            byte[] bytes = File.ReadAllBytes(args[0]);
+            Queue<byte> code = new Queue<byte>(bytes);
+            /*foreach(byte b in code)
             {
                 Console.WriteLine(b);
             }
-            foreach (Byte b in bytes)
+            Console.WriteLine(code);*/
+            int len = code.Count();
+            try
             {
-                code.Enqueue(b);
-            }
-            //code.Enqueue(bytes);
-            Console.WriteLine(code);
-            for (int x = 0; x < len; x++)
-            {
-                Byte opcode = code.Dequeue();
-                switch (opcode)
+                for (int x = 0; x < len; x++)
                 {
-                    case outcode:
-                        Console.Write(code.Dequeue());
-                        break;
+                    byte opcode = code.Dequeue();
 
+                    switch (opcode)
+                    {
+                        case outcode:
+                            Console.Write((Convert.ToChar(code.Dequeue())).ToString());
+                            break;
+
+                    }
                 }
             }
-            Console.WriteLine(args[0]);
+            catch(InvalidOperationException e)
+            {
+                //do nothing
+            }
+            
+            //Console.WriteLine(args[0]);
         }
     }
 }
