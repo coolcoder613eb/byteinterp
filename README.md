@@ -3,7 +3,5 @@ bytecode interpreter(sort of)
 opcodes
 00 exit ?
 01 write the next byte to stdout
-
-
-
-try use array instead of queue
+02 write a sequence of bytes to stdout until
+03 end byte sequence
