@@ -2,7 +2,7 @@
   "profiles": {
     "byteinterp": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\tzema\\OneDrive\\Documents\\GitHub\\byteinterp\\hw.bin"
+      "commandLineArgs": "..\\..\\..\\hw2.bin"
     }
   }
 }

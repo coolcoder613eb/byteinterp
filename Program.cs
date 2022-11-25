@@ -6,6 +6,8 @@ namespace byteinterp
     class Program
     {
         const byte outcode = 1;
+        const byte outseq = 2;
+        const byte endseq = 3;
         static void Main(string[] args)
         {
             byte[] bytes = File.ReadAllBytes(args[0]);
@@ -26,6 +28,20 @@ namespace byteinterp
                     {
                         case outcode:
                             Console.Write((Convert.ToChar(code.Dequeue())).ToString());
+                            break;
+                        case outseq:
+                            while (true)
+                            {
+                                byte ccode = code.Dequeue();
+                                if (ccode == endseq)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.Write((Convert.ToChar(ccode)).ToString());
+                                }
+                            }
                             break;
 
                     }
