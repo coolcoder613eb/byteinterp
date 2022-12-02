@@ -1,0 +1,24 @@
+; easm file
+; two stacks:
+; the int stack
+; and  the string stack
+; types:
+; string (in quotes): "hello world"
+; integer: 3
+
+; push 2 to the stack
+pushint 2
+
+; push 3 to the stack
+pushint 3
+
+; push the result of: add the top two items in the int stack
+pushint add
+; push to the string stack: stringify: pull the top item of the int stack
+pushstr string pullint
+
+; show: pull the top item of the int stack
+show pullstr
+
+; show: newline
+show "\n"
