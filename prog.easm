@@ -5,6 +5,7 @@
 ; types:
 ; string (in quotes): "hello world"
 ; integer: 3
+; *THE* first program written in easm
 
 ; push 2 to the stack
 pushint 2
