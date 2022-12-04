@@ -1,8 +1,19 @@
+; The first program written for a (probably) turing complete easm!
+; ----------------------------------------------------------------
+;
+; push 4 to the stack
 pushint 4
+; create a label called do
 : do
+; push -1 to the stack
 pushint -1
+; push: add the top two values on the stack to the stack
 pushint add
+; show: stringify: peek the top item in the stack
 show string peekint
+; if peekint != 1: show newline
 if not eq peekint 1 show "\n"
+; if peekint != 1: go to label do
 if not eq peekint 1 goto do
+; otherwise: (if peekint == 1) exit
 else exit
