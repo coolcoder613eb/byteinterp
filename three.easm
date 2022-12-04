@@ -1,0 +1,8 @@
+pushint 4
+: do
+pushint -1
+pushint add
+show string peekint
+if not eq peekint 1 show "\n"
+if not eq peekint 1 goto do
+else exit
