@@ -1,10 +1,10 @@
 # byteinterp
-bytecode interpreter(sort of)
-opcodes
-00 exit ?
-01 write the next byte to stdout
-02 write a sequence of bytes to stdout until
-03 end byte sequence
+bytecode interpreter(sort of)  
+opcodes  
+00 exit ?  
+01 write the next byte to stdout  
+02 write a sequence of bytes to stdout until  
+03 end byte sequence  
 
 # easm
 ```
@@ -43,11 +43,11 @@ opcodes
 ; b'\x06' string
 ; b'\x07' int
 ; b'\x08' concat
-; b'\t'   show
-; b'\n'   add
+; b'\x09' show
+; b'\x0a' add
 ; b'\x0b' mult
 ; b'\x0c' div
-; b'\r'   exit
+; b'\x0d' exit
 ; b'\x0e' intvar
 ; b'\x0f' strvar
 

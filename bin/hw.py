@@ -2,7 +2,7 @@
 import sys
 import shlex
 
-# --!@#$%^&*()
+sys.argv.append('--!@#$%^&*()')
 
 class EasmError(Exception):
     pass
@@ -39,15 +39,14 @@ else:
     debug = False
     binary = False
     interactive = False
-    # --!@#$%^&*()"""""".splitlines()
+    readlines = '''show "Hello World!"'''.splitlines()
 
 exitprog = sys.exit
 
 
 def pushint():
     statement = evaleasm()
-    #print(statement,type(statement))
-    if statement is not None and type(statement) == int:
+    if statement and type(statement) == int:
         int_stack.append(statement)
     else:
         raiseerror('Error in pushint!')
@@ -84,7 +83,7 @@ def string():
 
 
 def toint():
-    return int(evaleasm())
+    return int(str_stack.pop())
 
 
 def add():
@@ -124,31 +123,6 @@ def intvar():
 
     return None
 
-def eif():
-    global is_if
-    if bool(evaleasm()):
-        is_if=True
-        evaleasm()
-    else:
-        is_if = False
-
-def eelse():
-    global is_if
-    if not is_if:
-        evaleasm()
-        is_if = True
-
-def eq():
-    one = evaleasm()
-    two = evaleasm()
-    if one == two:
-        return 1
-    else:
-        return 0
-
-def ask():
-    return input()
-
 
 def show():
     statement = evaleasm()
@@ -169,10 +143,12 @@ proglines = []
 coms = {'pushint': pushint, 'pushstr': pushstr, 'pullint': pullint, 'pullstr': pullstr, 'peekint': peekint,
         'peekstr': peekstr, 'string': string, 'int': toint, 'concat': concat,
         'show': show, 'add': add, 'mult': mult, 'div': div, 'exit': exitprog,
-        'intvar': intvar, 'strvar': strvar,'ask':ask,'if':eif,'else':eelse,'eq':eq}
+        'intvar': intvar, 'strvar': strvar}
+bincoms = {b'\x00': pushint, b'\x01': pushstr, b'\x02': pullint, b'\x03': pullstr, b'\x04': peekint, b'\x05': peekstr,
+           b'\x06': string, b'\x07': toint, b'\x08': concat, b'\x09': show, b'\x0a': add, b'\x0b': mult, b'\x0c': div,
+           b'\x0d': exitprog, b'\x0e': intvar, b'\x0f': strvar}
 
 # coms = ['pushint', 'pushstr', 'pullint', 'pullstr', 'string', 'int', 'show']
-is_if=True
 
 str_stack = []
 int_stack = []
@@ -199,10 +175,16 @@ def tostr(txt):
 # tostr = str
 
 def iscom(com):
-    if com in coms:
-        return True
+    if not binary:
+        if com in coms:
+            return True
+        else:
+            return False
     else:
-        return False
+        if com in bincoms:
+            return True
+        else:
+            return False
 
 
 def isintvar(statement):
@@ -240,20 +222,22 @@ def evaleasm(isname=False):
         # print('statement:',statement,'| is string:', [isstr],'| is num:', [isnum],'| int stack:', int_stack,'| str stack:', str_stack)
         print('statement:', [statement], 'is command:', [is_com], 'is string:', [isstr], 'is num:', [isnum],
               'is str var:', [is_strvar], 'is int var:', [is_intvar], 'int stack:', int_stack,
-              'str stack:', str_stack, 'str vars:', [str_vars], 'int vars:', [int_vars],'is if',is_if)
-    #print(isnum is not None)
-    if isnum is not False:
-        return isnum
-    if isstr is not False:
-        # print(isstr)
-        return isstr
-    if is_com is not False:
-        return coms[statement]()
-    if is_strvar is not False:
+              'str stack:', str_stack, 'str vars:', [str_vars], 'int vars:', [int_vars])
+    if is_com:
+        if not binary:
+            return coms[statement]()
+        else:
+            return bincoms[statement]()
+    if is_strvar:
         # print(str_vars, statement)
         return str_vars[statement]
-    if is_intvar is not False:
+    if is_intvar:
         return int_vars[statement]
+    if isnum:
+        return isnum
+    if isstr:
+        # print(isstr)
+        return isstr
 
 
 prog = []

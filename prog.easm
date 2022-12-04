@@ -22,4 +22,4 @@ pushstr string pullint
 show pullstr
 
 ; show: newline
-show "\n"
+; show "\n"
