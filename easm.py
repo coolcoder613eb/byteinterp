@@ -14,6 +14,13 @@ if '-d' in sys.argv or '--debug' in sys.argv:
 else:
     debug = False
 
+if '-b' in sys.argv or '--binary' in sys.argv:
+    binary = True
+    if sys.argv[1] == '-b' or sys.argv[1] == '--binary':
+        sys.argv.pop(1)
+else:
+    binary = False
+
 try:
     with open(sys.argv[1], 'r', encoding='utf-8') as f:
         readlines = f.read().splitlines()
@@ -106,7 +113,7 @@ def intvar():
 
 def show():
     statement = evaleasm()
-    #print([statement], [type(statement)])
+    # print([statement], [type(statement)])
     if statement and type(statement) == str:
         if interactive:
             print(statement)
@@ -124,6 +131,9 @@ coms = {'pushint': pushint, 'pushstr': pushstr, 'pullint': pullint, 'pullstr': p
         'peekstr': peekstr, 'string': string, 'int': toint, 'concat': concat,
         'show': show, 'add': add, 'mult': mult, 'div': div, 'exit': exitprog,
         'intvar': intvar, 'strvar': strvar}
+bincoms = {b'\x00': pushint, b'\x01': pushstr, b'\x02': pullint, b'\x03': pullstr, b'\x04': peekint, b'\x05': peekstr,
+           b'\x06': string, b'\x07': toint, b'\x08': concat, b'\t': show, b'\n': add, b'\x0b': mult, b'\x0c': div,
+           b'\r': exitprog, b'\x0e': intvar, b'\x0f': strvar}
 
 # coms = ['pushint', 'pushstr', 'pullint', 'pullstr', 'string', 'int', 'show']
 
@@ -152,10 +162,16 @@ def tostr(txt):
 # tostr = str
 
 def iscom(com):
-    if com in coms:
-        return True
+    if not binary:
+        if com in coms:
+            return True
+        else:
+            return False
     else:
-        return False
+        if com in bincoms:
+            return True
+        else:
+            return False
 
 
 def isintvar(statement):
@@ -195,9 +211,12 @@ def evaleasm(isname=False):
               'is str var:', [is_strvar], 'is int var:', [is_intvar], 'int stack:', int_stack,
               'str stack:', str_stack, 'str vars:', [str_vars], 'int vars:', [int_vars])
     if is_com:
-        return coms[statement]()
+        if not binary:
+            return coms[statement]()
+        else:
+            return bincoms[statement]()
     if is_strvar:
-        #print(str_vars, statement)
+        # print(str_vars, statement)
         return str_vars[statement]
     if is_intvar:
         return int_vars[statement]
