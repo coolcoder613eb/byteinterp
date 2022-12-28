@@ -2,7 +2,7 @@
   "profiles": {
     "byteinterp": {
       "commandName": "Project",
-      "commandLineArgs": "..\\..\\..\\hw2.bin"
+      "commandLineArgs": "..\\..\\..\\cat.bin"
     }
   }
 }

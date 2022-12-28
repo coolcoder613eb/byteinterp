@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>assembler.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #919191;}
+.s1 { color: #000000;}
+.s2 { color: #ff5600;}
+.s3 { color: #008000; font-weight: bold;}
+.s4 { color: #8a822d;}
+.ln { color: #999999; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+assembler.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0"># import os</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0"># import sys</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s2">import </span>argparse
+<a name="l4"><span class="ln">4    </span></a><span class="s3">''' 
+<a name="l5"><span class="ln">5    </span></a>end    0 
+<a name="l6"><span class="ln">6    </span></a>poke   1 
+<a name="l7"><span class="ln">7    </span></a>peek   2 
+<a name="l8"><span class="ln">8    </span></a>add    3 
+<a name="l9"><span class="ln">9    </span></a>l      4 
+<a name="l10"><span class="ln">10   </span></a>show   5 
+<a name="l11"><span class="ln">11   </span></a>'''</span>
+<a name="l12"><span class="ln">12   </span></a><span class="s2">def </span>b(num)<span class="s2">: return </span>bytes([num])
+<a name="l13"><span class="ln">13   </span></a>coms <span class="s2">= </span>{
+<a name="l14"><span class="ln">14   </span></a>    <span class="s3">'end'</span><span class="s2">: </span>b(0),
+<a name="l15"><span class="ln">15   </span></a>    <span class="s3">'poke'</span><span class="s2">: </span>b(1),
+<a name="l16"><span class="ln">16   </span></a>    <span class="s3">'peek'</span><span class="s2">: </span>b(2),
+<a name="l17"><span class="ln">17   </span></a>    <span class="s3">'add'</span><span class="s2">: </span>b(3),
+<a name="l18"><span class="ln">18   </span></a>    <span class="s3">'l'</span><span class="s2">: </span>b(4),
+<a name="l19"><span class="ln">19   </span></a>    <span class="s3">'show'</span><span class="s2">: </span>b(5),
+<a name="l20"><span class="ln">20   </span></a>    }
+<a name="l21"><span class="ln">21   </span></a>parser <span class="s2">= </span>argparse.ArgumentParser()
+<a name="l22"><span class="ln">22   </span></a>parser.add_argument(<span class="s3">'file'</span>, help<span class="s2">=</span><span class="s3">'file to assemble'</span>)
+<a name="l23"><span class="ln">23   </span></a>parser.add_argument(<span class="s3">'-o'</span>, <span class="s3">'--output'</span>, help<span class="s2">=</span><span class="s3">'output filename'</span>)
+<a name="l24"><span class="ln">24   </span></a>args <span class="s2">= </span>parser.parse_args()
+<a name="l25"><span class="ln">25   </span></a>
+<a name="l26"><span class="ln">26   </span></a>file <span class="s2">= </span>args.file
+<a name="l27"><span class="ln">27   </span></a><span class="s2">if not </span>args.output<span class="s2">:</span>
+<a name="l28"><span class="ln">28   </span></a>    output <span class="s2">= </span><span class="s3">'.'</span>.join(file.split(<span class="s3">'.'</span>)[0<span class="s2">:-</span>1])<span class="s2">+</span><span class="s3">'.bin'</span>
+<a name="l29"><span class="ln">29   </span></a><span class="s2">else:</span>
+<a name="l30"><span class="ln">30   </span></a>    output <span class="s2">= </span>args.output
+<a name="l31"><span class="ln">31   </span></a>
+<a name="l32"><span class="ln">32   </span></a>print(<span class="s3">'Assembling:'</span>,file)
+<a name="l33"><span class="ln">33   </span></a><span class="s2">with </span>open(file,<span class="s3">'r'</span>,encoding<span class="s2">=</span><span class="s3">'utf-8'</span>) <span class="s2">as </span>f<span class="s2">:</span>
+<a name="l34"><span class="ln">34   </span></a>    read <span class="s2">= </span>f.read()
+<a name="l35"><span class="ln">35   </span></a>readlines1 <span class="s2">= </span>read.splitlines()
+<a name="l36"><span class="ln">36   </span></a>readlines <span class="s2">= </span>[]
+<a name="l37"><span class="ln">37   </span></a>result <span class="s2">= </span><span class="s4">b''</span>
+<a name="l38"><span class="ln">38   </span></a><span class="s2">for </span>x <span class="s2">in </span>readlines1<span class="s2">:</span>
+<a name="l39"><span class="ln">39   </span></a>    <span class="s2">if </span>x <span class="s2">and not </span>x.startswith(<span class="s3">';'</span>)<span class="s2">:</span>
+<a name="l40"><span class="ln">40   </span></a>        readlines.append(x)
+<a name="l41"><span class="ln">41   </span></a>
+<a name="l42"><span class="ln">42   </span></a>
+<a name="l43"><span class="ln">43   </span></a><span class="s2">for </span>x <span class="s2">in </span>readlines<span class="s2">:</span>
+<a name="l44"><span class="ln">44   </span></a>    <span class="s2">for </span>y <span class="s2">in </span>x.split()<span class="s2">:</span>
+<a name="l45"><span class="ln">45   </span></a>        <span class="s2">if </span>y.isdigit()<span class="s2">:</span>
+<a name="l46"><span class="ln">46   </span></a>            <span class="s2">if </span>int(y) <span class="s2">&gt; -</span>1 <span class="s2">and </span>int(y) <span class="s2">&lt; </span>256<span class="s2">:</span>
+<a name="l47"><span class="ln">47   </span></a>                result <span class="s2">+= </span>b(int(y))
+<a name="l48"><span class="ln">48   </span></a>        <span class="s2">elif </span>y <span class="s2">in </span>coms<span class="s2">:</span>
+<a name="l49"><span class="ln">49   </span></a>            result <span class="s2">+= </span>coms[y]
+<a name="l50"><span class="ln">50   </span></a>
+<a name="l51"><span class="ln">51   </span></a>
+<a name="l52"><span class="ln">52   </span></a><span class="s2">with </span>open(output,<span class="s3">'wb'</span>) <span class="s2">as </span>f<span class="s2">:</span>
+<a name="l53"><span class="ln">53   </span></a>    f.write(result)
+<a name="l54"><span class="ln">54   </span></a>print(<span class="s3">'Output:'</span>,output)
+<a name="l55"><span class="ln">55   </span></a></pre>
+</body>
+</html>
