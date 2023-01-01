@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -335,11 +336,13 @@ namespace teenytiny
         Emitter emitter;
 
         HashSet<string> symbols; // All variables we have declared so far.
-        HashSet<string> labelsDeclared; // Keep track of all labels declared
+        Dictionary<string, int> labelsDeclared; // Keep track of all labels declared
         HashSet<string> labelsGotoed; // All labels goto'ed, so we know if they exist or not.
 
         Token curToken;
         Token peekToken;
+        int labs = 0;
+        int ulabs = 255;
 
         public Parser(Lexer lexer, Emitter emitter)
         {
@@ -347,11 +350,12 @@ namespace teenytiny
             this.emitter = emitter;
 
             symbols = new HashSet<string>();
-            labelsDeclared = new HashSet<string>();
+            labelsDeclared = new Dictionary<string,int>();
             labelsGotoed = new HashSet<string>();
 
             curToken = null;
             peekToken = null;
+            
             nextToken();
             nextToken(); // Call this twice to initialize current and peek.
         }
@@ -412,7 +416,7 @@ namespace teenytiny
 
             // Check that each label referenced in a GOTO is declared.
             foreach (string label in labelsGotoed)
-                if (!labelsDeclared.Contains(label))
+                if (!labelsDeclared.Keys.Contains(label))
                     abort("Attempting to GOTO to undeclared label: " + label);
         }
 
@@ -441,14 +445,21 @@ namespace teenytiny
 
                 if (checkToken(TokenType.STRING))
                 {
+                    foreach(char x in curToken.text)
+                    {
+                        emitter.headerLine("push " + (int)x);
+                        emitter.headerLine("put");
+                    }
+                    emitter.headerLine("push " + (int)'\n');
+                    emitter.headerLine("put");
                     // Simple string, so print it.
-                    emitter.emitLine("printf(\"" + curToken.text + "\\n\");");
+                    //emitter.emitLine("printf(\"" + curToken.text + "\\n\");");
                     nextToken();
                 }
                 else
                 {
                     // Expect an expression and print the result as a float.
-                    emitter.emit("printf(\"%" + ".2f\\n\", (float)(");
+                    emitter.emit("printf(\"%" + ".2f\\n\", (float)("); ////////////////////////////////////////////////////////////////
                     expression();
                     emitter.emitLine("));");
                 }
@@ -458,22 +469,26 @@ namespace teenytiny
             else if (checkToken(TokenType.IF))
             {
                 nextToken();
-                emitter.emit("if(");
                 comparison();
-
+                emitter.emitLine("jif +"+(labs+1));
+                emitter.emitLine(":" + labs);
+                var ifback = labs;
+                labs++;
                 match(TokenType.THEN);
                 nl();
-                emitter.emitLine("){");
+                emitter.headerLine(":"+labs);
+                labs++;
+                //emitter.emitLine("){");
 
                 // Zero or more statements in the body.
                 while (!checkToken(TokenType.ENDIF))
                     statement();
 
                 match(TokenType.ENDIF);
-                emitter.emitLine("}");
+                emitter.headerLine("jmp +"+ifback);
             }
 
-            // "WHILE" comparison "REPEAT" block "ENDWHILE"
+            // "WHILE" comparison "REPEAT" block "ENDWHILE" ///////////////////////////////////////////////////
             else if (checkToken(TokenType.WHILE))
             {
                 nextToken();
@@ -497,11 +512,12 @@ namespace teenytiny
                 nextToken();
 
                 // Make sure this label doesn't already exist.
-                if (labelsDeclared.Contains(curToken.text))
+                if (labelsDeclared.Keys.Contains(curToken.text))
                     abort("Label already exists: " + curToken.text);
-                labelsDeclared.Add(curToken.text);
+                labelsDeclared.Add(curToken.text,ulabs);
 
-                emitter.emitLine(curToken.text + ":");
+                emitter.emitLine(":" + ulabs);
+                ulabs--;
                 match(TokenType.IDENT);
             }
 
@@ -510,10 +526,10 @@ namespace teenytiny
             {
                 nextToken();
                 labelsGotoed.Add(curToken.text);
-                emitter.emitLine("goto " + curToken.text + ";");
+                emitter.emitLine("jmp " + labelsDeclared[curToken.text]);
                 match(TokenType.IDENT);
             }
-
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // "LET" ident = expression
             else if (checkToken(TokenType.LET))
             {
@@ -540,7 +556,7 @@ namespace teenytiny
                 nextToken();
 
                 // If variable doesn't already exist, declare it.
-                if (!symbols.Contains(curToken.text))
+                /*if (!symbols.Contains(curToken.text))
                 {
                     symbols.Add(curToken.text);
                     emitter.headerLine("float " + curToken.text + ";");
@@ -551,7 +567,8 @@ namespace teenytiny
                 emitter.emitLine(curToken.text + " = 0;");
                 emitter.emit("scanf(\"%");
                 emitter.emitLine("*s\");");
-                emitter.emitLine("}");
+                emitter.emitLine("}");*/
+                emitter.emitLine("get");
                 match(TokenType.IDENT);
             }
 
@@ -691,7 +708,7 @@ class Emitter
         {
             using (StreamWriter outputFile = new StreamWriter(fullPath))
             {
-                outputFile.Write(header + code);
+                outputFile.Write(header + code + "\nhalt");
             }
         }
     }

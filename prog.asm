@@ -11,10 +11,5 @@ store 0
 :h
 get
 put
-load 0
-push 1
-add
-store 0
 jmp +h
-:endh
 halt
