@@ -2,16 +2,19 @@
 ; poke 50 add l 60 l 5
 ; show peek
 ; show add l 60 l 5
-show l 'H
-show l 'e
-show l 'l
-show l 'l
-show l 'o
-show l ',
-show l 32 ; char: " "
-show l 'W
-show l 'o
-show l 'r
-show l 'l
-show l 'd
-show l '!
+push 60
+push 5
+add
+put
+push 0
+store 0
+:h
+get
+put
+load 0
+push 1
+add
+store 0
+jmp +h
+:endh
+halt
