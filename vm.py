@@ -206,7 +206,12 @@ class CPU():
                 else:
                     raise Exception("Not enough values on the stack!")
             case i.GET:
-                n1 = ord(get())
+                while True:
+                    try:
+                        n1 = int(input())
+                        break
+                    except:
+                        pass
                 #print([n1])
                 self.stack.append(n1)
 
@@ -222,3 +227,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         with open(sys.argv[1], 'rb') as f:
             test(list(f.read()), False)
+    else:
+        print('usage: vm.py FILE')
